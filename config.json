@@ -2,6 +2,10 @@
   "juliang_account": [
     "phonenumber@passwd@wxpusherUID"
   ],
+  "ttshitu_config": {
+    "username": "xxxx",
+    "password": "xxxx"
+  },
   "proxy_config": {
     "proxy_address": "ip:port",
     "proxy_username": "user",
