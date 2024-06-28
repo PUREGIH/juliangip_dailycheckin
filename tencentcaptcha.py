@@ -29,20 +29,16 @@ class Tencent:
     识别腾讯验证码
     """
 
-    def __init__(self, url, username, password, browser=None):
+    def __init__(self, ttshitu_username, ttshitu_password, browser=None):
         """
         初始化浏览器配置，声明变量
 
-        :param url: 要登录的网站地址
-        :param username: 账号
-        :param password: 密码
         :param browser: 浏览器实例
         """
         self.browser = browser if browser else webdriver.Chrome()
         self.wait = WebDriverWait(self.browser, 20)
-        self.url = url
-        self.username = username
-        self.password = password
+        self.ttshitu_username = ttshitu_username
+        self.ttshitu_password = ttshitu_password
 
     def end(self):
         """
@@ -70,7 +66,7 @@ class Tencent:
         try:
             bk_block = match.group(1)
             if Tencent.save_img(bk_block):
-                dex = Tencent.get_pos()
+                dex = self.get_pos()
                 if dex:
                     track_list = Tencent.get_track(dex)
                     time.sleep(0.5)
@@ -112,8 +108,7 @@ class Tencent:
             print(f"保存图像时出错： {e}")
             return False
 
-    @staticmethod
-    def get_pos():
+    def get_pos(self):
         """
         识别缺口
         注意：网页上显示的图片为缩放图片，缩放 50% 所以识别坐标需要 0.5
@@ -155,8 +150,8 @@ class Tencent:
             
         # 调用验证码识别API
         data = {
-            "username": "user",
-            "password": 'passwd',
+            "username": self.ttshitu_username,
+            "password": self.ttshitu_password,
             "typeid": 33,
             "image": b64
         }
