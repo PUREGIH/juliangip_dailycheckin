@@ -15,6 +15,7 @@ import zipfile
 import requests
 import hashlib
 
+
 # 创建代理插件
 def create_proxy_extension(proxy_host, proxy_port, proxy_user, proxy_pass):
     manifest_json = """
@@ -72,6 +73,8 @@ def create_proxy_extension(proxy_host, proxy_port, proxy_user, proxy_pass):
         zp.writestr("background.js", background_js)
 
     return pluginfile
+
+
 # 读取配置文件
 def read_config(file_path):
     try:
@@ -85,19 +88,24 @@ def read_config(file_path):
     except json.JSONDecodeError:
         print(f"从文件 {file_path} 解码JSON时出错。")
     return None
+
+
 # 获取配置信息
 def get_config(config, key, default=None):
     value = config.get(key, default)
     if value is None:
         raise ValueError(f"没有配置 {key}")
     return value
+
+
 # 检查代理配置是否有效
-def is_proxy_valid(config):
-    keys = ['proxy_address', 'proxy_username', 'proxy_password']
+def is_config_valid(config, keys):
     for key in keys:
         if key not in config or not config[key]:
             return False
     return True
+
+
 # wxpusher消息推送
 def wxpush(title, text, uids, appToken):
     content = f'''<!DOCTYPE html> <html lang="zh-CN"> <head> <meta charset="UTF-8"> <title>{title}</title> <style type=text/css> body {{ background-image: linear-gradient(120deg, #1E90FF 0%, #a5d0e5 100%); background-size: 300%; animation: bgAnimation 6s linear infinite; }} @keyframes bgAnimation {{ 0% {{background-position: 0% 50%;}} 50% {{background-position: 100% 50%;}} 100% {{background-position: 0% 50%;}} }} </style> </head> <body> <pre>{text}</pre><br> <br> </body> </html> '''
@@ -119,42 +127,54 @@ def wxpush(title, text, uids, appToken):
         except requests.RequestException:
             print('推送失败！')
 
+
 # 解析字符串
 def parse_string(input_string, error_message):
     parts = input_string.split('@')
     if len(parts) < 2:
         raise ValueError(error_message)
     return parts
+
+
 # 解析账号
 def parse_account(account):
     parts = parse_string(account, f"账号格式错误: {account}")
     username, password = parts[0], parts[1]
     uids = parts[2] if len(parts) > 2 and parts[2] else None
     return username, password, uids
+
+
 # 解析API配置
 def parse_api_config(config):
     parts = parse_string(config, f"API配置格式错误: {config}")
     trade_no, key = parts[0], parts[1]
     return trade_no, key
 
+
 # 配置Chrome选项
 def configure_chrome_options(use_proxy, proxy_address, proxy_username, proxy_password):
     chrome_options = Options()
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
+    # chrome_options.binary_location = r'D:\Apps\chrome89\Chrome-bin\chrome.exe'
     if use_proxy:
         proxy_host, proxy_port = proxy_address.split(':')
         proxy_plugin = create_proxy_extension(proxy_host, proxy_port, proxy_username, proxy_password)
         chrome_options.add_extension(proxy_plugin)
     return chrome_options
 
+
 class Juliang_net(Tencent):
     """
     基于巨量IP的签到类
     """
-    def __init__(self, url, username, password, browser):
-        super().__init__(url, username, password, browser)
+
+    def __init__(self, url, username, password, browser, ttshitu_username, ttshitu_password):
+        super().__init__(ttshitu_username, ttshitu_password, browser)
         self.browser = browser  # 设置浏览器对象
+        self.url = url
+        self.username = username
+        self.password = password
         self.wait = WebDriverWait(self.browser, 30)  # 显式等待 30 秒
 
     def set_info(self):
@@ -174,7 +194,7 @@ class Juliang_net(Tencent):
             print("单击登录按钮...")
             login_button = self.browser.find_element(By.ID, 'login')
             login_button.click()
-            
+
             # 增加延迟，确保页面成功登录
             time.sleep(5)
 
@@ -183,11 +203,12 @@ class Juliang_net(Tencent):
             sign_button.click()
             print("已单击“签到”按钮")
             time.sleep(10)
-            
+
         except Exception as e:
             print('错误:', e)
             print("准备重试...")
             self.set_info()
+
     # 构建URL
     @staticmethod
     def build_api_url(trade_no, key, num=1, **options):
@@ -215,7 +236,8 @@ class Juliang_net(Tencent):
     def get_sign_content(params):
         params.pop('sign', None)  # 删除 sign
         sorted_params = sorted(params.items())
-        sign_content = '&'.join([f"{k}={str(v)}" for k, v in sorted_params if str(v) is not None and not str(v).startswith('@')])
+        sign_content = '&'.join(
+            [f"{k}={str(v)}" for k, v in sorted_params if str(v) is not None and not str(v).startswith('@')])
         return sign_content
 
     # def get_url(self, api_key):
@@ -264,7 +286,7 @@ class Juliang_net(Tencent):
     #         # 点击复制链接按钮
     #         copy_button = self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'el-icon-document-copy')))
     #         copy_button.click()
-            
+
     #         # 增加延迟以确保内容复制完成
     #         time.sleep(2)
 
@@ -286,10 +308,10 @@ class Juliang_net(Tencent):
     #         new_url = Juliang_net.build_url(trade_no, 1, api_key, sqlit=2)
     #         print("api url:", new_url)
 
-
     #     except Exception as e:
     #         print(f"操作时出错：{e}")
     #         return None
+
 
 # 主函数
 def main():
@@ -310,11 +332,20 @@ def main():
     appToken = wxpush_config.get('appToken', '')
     title = wxpush_config.get('title', '巨量IP签到')
 
+    # 读取shitu配置
+    ttshitu_config = get_config(config, 'ttshitu_config', {})
+    ttshitu_username = ttshitu_config.get('username')
+    ttshitu_password = ttshitu_config.get('password')
+
+    ttshitu = is_config_valid(ttshitu_config, ['username', 'password'])
+    if not ttshitu:
+        raise ValueError("未配置ttshitu")
+
     # 读取代理配置
     proxy_config = get_config(config, 'proxy_config', {})
 
     # 检查代理配置是否有效
-    use_proxy = is_proxy_valid(proxy_config)
+    use_proxy = is_config_valid(proxy_config, ['proxy_address', 'proxy_username', 'proxy_password'])
     if use_proxy:
         proxy_address = proxy_config['proxy_address']
         proxy_username = proxy_config['proxy_username']
@@ -345,13 +376,14 @@ def main():
         chrome_options = configure_chrome_options(use_proxy, proxy_address, proxy_username, proxy_password)
 
         # 手动指定chromedriver路径
+        # D:\Apps\chrome89\Chrome-bin\chromedriver.exe
         chromedriver_path = r'C:\Users\windowsuser\AppData\Local\Google\Chrome\Application\chromedriver.exe'
         service = Service(chromedriver_path)
 
         # 创建浏览器实例
         try:
             browser = webdriver.Chrome(service=service, options=chrome_options)
-            tencent = Juliang_net(url, username, password, browser)
+            tencent = Juliang_net(url, username, password, browser, ttshitu_username, ttshitu_password)
 
             # 过滑块验证
             tencent.re_start()
@@ -362,13 +394,15 @@ def main():
             # 提取url操作
             api_url = tencent.build_api_url(trade_no, api_key, split=2, area='四川')
 
-            # 保存auto-proxy-pool
-            save_pool = set_proxy_pool(proxy_pool_url, api_url, auth)
+            # 检查auto-proxy-pool配置是否有效
+            use_save_pool = is_config_valid(proxy_pool_config, ['proxy_pool_url', 'auth'])
+            if use_save_pool:
+                # 保存auto-proxy-pool
+                set_proxy_pool(proxy_pool_url, api_url, auth)
 
-            if save_pool:
-                # wxpusher消息推送
-                if uids:
-                    wxpush(title, api_url, [uids], appToken)
+            # wxpusher消息推送
+            if uids:
+                wxpush(title, api_url, [uids], appToken)
 
         except Exception as e:
             raise Exception(f"处理帐户 {username} 时发生错误: {e}")
@@ -376,5 +410,7 @@ def main():
         finally:
             # 确保关闭浏览器
             tencent.end()
+
+
 if __name__ == '__main__':
     main()
