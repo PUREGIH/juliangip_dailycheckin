@@ -1,0 +1,23 @@
+{
+  "juliang_account": [
+    "phonenumber@passwd@wxpusherUID"
+  ],
+  "proxy_config": {
+    "proxy_address": "ip:port",
+    "proxy_username": "user",
+    "proxy_password": "passwd"
+  },
+  "wxpush_config": {
+    "appToken": "xxxxxx",
+    "title": "巨量IP签到"
+  },
+  "juliang_api_config": ["trade_no@API_KEY"
+  ],
+  "auto_proxy_pool_config": {
+    "proxy_pool_url": "http://ip:port",
+    "auth": {
+      "username": "admin",
+      "password": "passwd"
+    }
+  }
+}
