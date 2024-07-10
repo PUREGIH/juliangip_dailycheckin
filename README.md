@@ -1,6 +1,5 @@
 # 巨量IP签到
 
----
 ## 介绍
 windows下的巨量IP签到脚本
 
@@ -24,9 +23,9 @@ pip install -r requirements.txt
     "password": "xxxx"
   },
   "proxy_config": {
-    "proxy_address": "ip:port",
-    "proxy_username": "user",
-    "proxy_password": "passwd"
+    "proxy_address": "",
+    "proxy_username": "",
+    "proxy_password": ""
   },
   "wxpush_config": {
     "appToken": "xxxxxx",
@@ -35,27 +34,28 @@ pip install -r requirements.txt
   "juliang_api_config": ["trade_no@API_KEY"
   ],
   "auto_proxy_pool_config": {
-    "proxy_pool_url": "http://ip:port",
+    "proxy_pool_url": "",
     "auth": {
-      "username": "admin",
-      "password": "passwd"
+      "username": "",
+      "password": ""
     }
   }
 }
 ```
-- `juliang_account`巨量账号，`wxpusherUID`wxpusher推送的UID，可以不填。
-- `ttshitu_config`图图打码API配置。
-- `proxy_config`代理配置，可以不填。
-- `wxpush_config`wxpusher推送配置，可以不填。
-- `juliang_api_config`巨量API，`trade_no`为业务编号，`API_KEY`为API密钥。
-- `auto_proxy_pool_config`用于自动提交PROXY API到代理池，可以不填。
+- `juliang_account`：巨量账号。`wxpusherUID`：wxpusher推送的UID，可以不填。
+- `ttshitu_config`：图鉴API配置，**必填**。
+- `proxy_config`：代理配置，可以不填。
+- `wxpush_config`：wxpusher推送配置，可以不填。
+- `juliang_api_config`：巨量API，`trade_no`为业务编号，`API_KEY`为API密钥。
+- `auto_proxy_pool_config`：用于自动提交PROXY API到代理池，可以不填。
+
 编辑`juliang.py`文件，修改第344行：
 ```python
 # 修改为你的chromedriver路径
 chromedriver_path = r'C:\Users\windowsuser\AppData\Local\Google\Chrome\Application\chromedriver.exe'
 ```
 
-运行脚本：
+**运行脚本**：
 
 `python juliang.py`
 
