@@ -377,7 +377,8 @@ def main():
 
         # 手动指定chromedriver路径
         # D:\Apps\chrome89\Chrome-bin\chromedriver.exe
-        chromedriver_path = r'C:\Users\windowsuser\AppData\Local\Google\Chrome\Application\chromedriver.exe'
+        # C:\Users\windowsuser\AppData\Local\Google\Chrome\Application\chromedriver.exe
+        chromedriver_path = r'D:\Apps\chrome89\Chrome-bin\chromedriver.exe'
         service = Service(chromedriver_path)
 
         # 创建浏览器实例
