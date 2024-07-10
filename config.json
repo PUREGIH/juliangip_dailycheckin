@@ -7,21 +7,21 @@
     "password": "xxxx"
   },
   "proxy_config": {
-    "proxy_address": "ip:port",
-    "proxy_username": "user",
-    "proxy_password": "passwd"
+    "proxy_address": "",
+    "proxy_username": "",
+    "proxy_password": ""
   },
   "wxpush_config": {
-    "appToken": "xxxxxx",
+    "appToken": "AT_xxxxxx",
     "title": "巨量IP签到"
   },
   "juliang_api_config": ["trade_no@API_KEY"
   ],
   "auto_proxy_pool_config": {
-    "proxy_pool_url": "http://ip:port",
+    "proxy_pool_url": "",
     "auth": {
-      "username": "admin",
-      "password": "passwd"
+      "username": "",
+      "password": ""
     }
   }
 }
