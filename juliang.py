@@ -156,6 +156,8 @@ def configure_chrome_options(use_proxy, proxy_address, proxy_username, proxy_pas
     chrome_options = Options()
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--disable-software-rasterizer')
     # chrome_options.binary_location = r'D:\Apps\chrome89\Chrome-bin\chrome.exe'
     if use_proxy:
         proxy_host, proxy_port = proxy_address.split(':')
@@ -377,13 +379,13 @@ def main():
 
         # 手动指定chromedriver路径
         # D:\Apps\chrome89\Chrome-bin\chromedriver.exe
-        # C:\Users\windowsuser\AppData\Local\Google\Chrome\Application\chromedriver.exe
-        chromedriver_path = r'D:\Apps\chrome89\Chrome-bin\chromedriver.exe'
+        chromedriver_path = r'C:\Users\windowsuser\AppData\Local\Google\Chrome\Application\chromedriver.exe'
         service = Service(chromedriver_path)
 
         # 创建浏览器实例
         try:
             browser = webdriver.Chrome(service=service, options=chrome_options)
+            browser.set_page_load_timeout(30)  # 设置页面加载超时时间为30秒
             tencent = Juliang_net(url, username, password, browser, ttshitu_username, ttshitu_password)
 
             # 过滑块验证
@@ -410,8 +412,8 @@ def main():
 
         finally:
             # 确保关闭浏览器
-            tencent.end()
-
+            if 'tencent' in locals():
+                tencent.end()
 
 if __name__ == '__main__':
     main()
