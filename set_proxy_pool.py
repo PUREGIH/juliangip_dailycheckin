@@ -12,21 +12,16 @@ def set_proxy_pool(proxy_pool_url, api_url_list, auth):
         },
         "users": {},
         "upstream": {},
-        "changeRequest": [
-            {
-                "hostRegex": ".*",
-                "loadBalanceInterval": 0,
-                "black": False,
-                "proxy": "proxy"
-            }
-        ],
+        "changeRequest": [],
         "dev": {},
         "DefaultFailBack": ""
     }
 
     # 动态生成 upstream 配置
+    proxy_names = []
     for index, api_url in enumerate(api_url_list):
         proxy_name = f"proxy{index + 1}"
+        proxy_names.append(proxy_name)
         data["upstream"][proxy_name] = {
             "apiUrl": api_url,
             "upstreamFixedAuth": "",
@@ -36,7 +31,7 @@ def set_proxy_pool(proxy_pool_url, api_url_list, auth):
             "proactiveOnIdleSize": 0,
             "proactiveOnIdleCheckInterval": "",
             "maxSize": 3,
-            "loadBalanceMultiple": 0,
+            "loadBalanceMultiple": 1,
             "disableOptimizationIp": False,
             "enableReduceReuseIp": False,
             "groupIndex": 0,
@@ -44,6 +39,14 @@ def set_proxy_pool(proxy_pool_url, api_url_list, auth):
             "failThreshold": 0,
             "disableHttpUseTunnel": False
         }
+
+    # 将所有上游以逗号分隔的形式添加到 changeRequest
+    data["changeRequest"].append({
+        "hostRegex": ".*",
+        "loadBalanceInterval": 0,
+        "black": False,
+        "proxy": ",".join(proxy_names)
+    })
 
     # 认证凭证
     auth = HTTPBasicAuth(auth['username'], auth['password'])
