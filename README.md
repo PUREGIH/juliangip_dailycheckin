@@ -23,7 +23,7 @@ pip install -r requirements.txt
     "password": "xxxx"
   },
   "proxy_config": {
-    "proxy_address": "",
+    "proxy_address": "",  // ip:port
     "proxy_username": "",
     "proxy_password": ""
   },
@@ -34,7 +34,7 @@ pip install -r requirements.txt
   "juliang_api_config": ["trade_no@API_KEY"
   ],
   "auto_proxy_pool_config": {
-    "proxy_pool_url": "",
+    "proxy_pool_url": "",  // http://ip:port
     "auth": {
       "username": "",
       "password": ""
@@ -71,3 +71,4 @@ python your_path\juliangip_dailycheckin\juliang.py
 call %VIRTUAL_ENV%\Scripts\deactivate
 ```
 将`*.bat`添加到计划任务。
+
