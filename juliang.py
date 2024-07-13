@@ -368,6 +368,9 @@ def main():
 
     url = 'https://www.juliangip.com/user/login'
 
+    # 定义一个列表来存储api_url
+    api_url_list = []
+
     for account, api_config in zip(juliang_account, juliang_api_config):
         print(f"正在处理帐户: {account}")
 
@@ -379,7 +382,8 @@ def main():
 
         # 手动指定chromedriver路径
         # D:\Apps\chrome89\Chrome-bin\chromedriver.exe
-        chromedriver_path = r'C:\Users\windowsuser\AppData\Local\Google\Chrome\Application\chromedriver.exe'
+        # C:\Users\windowsuser\AppData\Local\Google\Chrome\Application\chromedriver.exe
+        chromedriver_path = r'D:\Apps\chrome89\Chrome-bin\chromedriver.exe'
         service = Service(chromedriver_path)
 
         # 创建浏览器实例
@@ -397,11 +401,8 @@ def main():
             # 提取url操作
             api_url = tencent.build_api_url(trade_no, api_key, split=2, area='四川')
 
-            # 检查auto-proxy-pool配置是否有效
-            use_save_pool = is_config_valid(proxy_pool_config, ['proxy_pool_url', 'auth'])
-            if use_save_pool:
-                # 保存auto-proxy-pool
-                set_proxy_pool(proxy_pool_url, api_url, auth)
+            # 将生成的 api_url 添加到列表中
+            api_url_list.append(api_url)
 
             # wxpusher消息推送
             if uids:
@@ -414,6 +415,13 @@ def main():
             # 确保关闭浏览器
             if 'tencent' in locals():
                 tencent.end()
+
+    # 检查auto-proxy-pool配置是否有效
+    use_save_pool = is_config_valid(proxy_pool_config, ['proxy_pool_url', 'auth'])
+    if use_save_pool:
+        # 保存auto-proxy-pool
+        set_proxy_pool(proxy_pool_url, api_url_list, auth)
+
 
 if __name__ == '__main__':
     main()
